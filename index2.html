@@ -1,0 +1,257 @@
+document.addEventListener('DOMContentLoaded', () => {
+  // Container to inject tricks UI
+  let container = document.createElement('div');
+  container.id = 'magic-tricks-container';
+  container.style.maxWidth = '600px';
+  container.style.margin = '50px auto';
+  container.style.padding = '20px';
+  container.style.background = '#f0f4f8';
+  container.style.borderRadius = '12px';
+  container.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+  container.style.fontFamily = 'Arial, sans-serif';
+  document.body.appendChild(container);
+
+  container.innerHTML = `<h2 style="color:#0a1f44; text-align:center; margin-bottom:20px;">
+    Interactive Math Tricks</h2>`;
+
+  // Helper to create inputs and buttons
+  function createInput(labelText, id) {
+    let wrapper = document.createElement('div');
+    wrapper.style.marginBottom = '15px';
+
+    let label = document.createElement('label');
+    label.for = id;
+    label.textContent = labelText;
+    label.style.display = 'block';
+    label.style.marginBottom = '5px';
+    label.style.color = '#132f5b';
+    wrapper.appendChild(label);
+
+    let input = document.createElement('input');
+    input.type = 'number';
+    input.id = id;
+    input.style.padding = '8px';
+    input.style.width = '100%';
+    input.style.borderRadius = '6px';
+    input.style.border = '1px solid #ccc';
+    input.style.fontSize = '1rem';
+    wrapper.appendChild(input);
+
+    return { wrapper, input };
+  }
+
+  // Show result with a message
+  function showResult(message) {
+    let res = document.getElementById('trick-result');
+    if (!res) {
+      res = document.createElement('div');
+      res.id = 'trick-result';
+      res.style.marginTop = '20px';
+      res.style.padding = '15px';
+      res.style.borderRadius = '8px';
+      res.style.background = '#d1e7dd';
+      res.style.color = '#0f5132';
+      res.style.fontWeight = '600';
+      res.style.fontSize = '1.1rem';
+      container.appendChild(res);
+    }
+    res.textContent = message;
+  }
+
+  // --- Trick 1: Zeller's formula day of week ---
+  const zellerDiv = document.createElement('div');
+  zellerDiv.style.marginBottom = '40px';
+  zellerDiv.innerHTML = `<h3 style="color:#0a1f44;">1. Zeller's Formula - Find Day of Week</h3>`;
+  container.appendChild(zellerDiv);
+
+  let { wrapper: dayW, input: dayInput } = createInput('Enter Day (1-31):', 'zeller-day');
+  let { wrapper: monthW, input: monthInput } = createInput('Enter Month (1-12):', 'zeller-month');
+  let { wrapper: yearW, input: yearInput } = createInput('Enter Year (e.g. 2023):', 'zeller-year');
+
+  zellerDiv.appendChild(dayW);
+  zellerDiv.appendChild(monthW);
+  zellerDiv.appendChild(yearW);
+
+  let btnZeller = document.createElement('button');
+  btnZeller.textContent = 'Calculate Day';
+  btnZeller.style.padding = '10px 20px';
+  btnZeller.style.background = '#1aa9a0';
+  btnZeller.style.border = 'none';
+  btnZeller.style.color = '#fff';
+  btnZeller.style.borderRadius = '25px';
+  btnZeller.style.fontWeight = '700';
+  btnZeller.style.cursor = 'pointer';
+  btnZeller.addEventListener('click', () => {
+    let q = parseInt(dayInput.value);
+    let m = parseInt(monthInput.value);
+    let Y = parseInt(yearInput.value);
+
+    if (!q || !m || !Y) {
+      showResult('Please enter valid day, month, and year.');
+      return;
+    }
+
+    // Zeller’s formula adjustment for months Jan & Feb
+    if (m < 3) {
+      m += 12;
+      Y -= 1;
+    }
+
+    let K = Y % 100;
+    let J = Math.floor(Y / 100);
+
+    let h = (q + Math.floor((13*(m+1))/5) + K + Math.floor(K/4) + Math.floor(J/4) + 5*J) % 7;
+    const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+    showResult(`The day of week is: ${days[h]}`);
+  });
+  zellerDiv.appendChild(btnZeller);
+
+  // --- Trick 2: DOB reveal -- simple sum example ---
+  const dobDiv = document.createElement('div');
+  dobDiv.style.marginBottom = '40px';
+  dobDiv.innerHTML = `<h3 style="color:#0a1f44;">2. Your Date of Birth Trick</h3>`;
+  container.appendChild(dobDiv);
+
+  let { wrapper: dobInputW, input: dobInput } = createInput('Enter your DOB as YYYYMMDD (e.g. 19901225):', 'dob-input');
+  dobDiv.appendChild(dobInputW);
+
+  let btnDOB = document.createElement('button');
+  btnDOB.textContent = 'Reveal DOB Sum';
+  btnDOB.style.padding = '10px 20px';
+  btnDOB.style.background = '#1aa9a0';
+  btnDOB.style.border = 'none';
+  btnDOB.style.color = '#fff';
+  btnDOB.style.borderRadius = '25px';
+  btnDOB.style.fontWeight = '700';
+  btnDOB.style.cursor = 'pointer';
+  btnDOB.addEventListener('click', () => {
+    let val = dobInput.value.trim();
+    if (!/^\d{8}$/.test(val)) {
+      showResult('Enter your DOB exactly as 8 digits: YYYYMMDD');
+      return;
+    }
+    let digits = val.split('').map(Number);
+    let sum = digits.reduce((a,b)=>a+b, 0);
+    showResult(`Sum of your DOB digits is: ${sum}`);
+  });
+  dobDiv.appendChild(btnDOB);
+
+  // --- Trick 3: Height guess (fun interaction) ---
+  const heightDiv = document.createElement('div');
+  heightDiv.style.marginBottom = '40px';
+  heightDiv.innerHTML = `<h3 style="color:#0a1f44;">3. Height Guess Trick</h3>`;
+  container.appendChild(heightDiv);
+
+  let { wrapper: heightInputW, input: heightInput } = createInput('Enter your height in cm:', 'height-input');
+  heightDiv.appendChild(heightInputW);
+
+  let btnHeight = document.createElement('button');
+  btnHeight.textContent = 'Reveal Height Info';
+  btnHeight.style.padding = '10px 20px';
+  btnHeight.style.background = '#1aa9a0';
+  btnHeight.style.border = 'none';
+  btnHeight.style.color = '#fff';
+  btnHeight.style.borderRadius = '25px';
+  btnHeight.style.fontWeight = '700';
+  btnHeight.style.cursor = 'pointer';
+  btnHeight.addEventListener('click', () => {
+    let h = parseInt(heightInput.value);
+    if (!h || h < 50 || h > 250) {
+      showResult('Please enter a valid height between 50 and 250 cm.');
+      return;
+    }
+    showResult(`Your height is approximately ${h} cm — nice!`);
+  });
+  heightDiv.appendChild(btnHeight);
+
+  // --- Trick 4: Final Number 5 (always 5) ---
+  const final5Div = document.createElement('div');
+  final5Div.style.marginBottom = '40px';
+  final5Div.innerHTML = `<h3 style="color:#0a1f44;">4. Final Number Always 5 Trick</h3>`;
+  container.appendChild(final5Div);
+
+  let { wrapper: finalNumW, input: finalNumInput } = createInput('Enter any number:', 'final-num-input');
+  final5Div.appendChild(finalNumW);
+
+  let btnFinal5 = document.createElement('button');
+  btnFinal5.textContent = 'Calculate Final Number';
+  btnFinal5.style.padding = '10px 20px';
+  btnFinal5.style.background = '#1aa9a0';
+  btnFinal5.style.border = 'none';
+  btnFinal5.style.color = '#fff';
+  btnFinal5.style.borderRadius = '25px';
+  btnFinal5.style.fontWeight = '700';
+  btnFinal5.style.cursor = 'pointer';
+  btnFinal5.addEventListener('click', () => {
+    let n = parseInt(finalNumInput.value);
+    if (isNaN(n)) {
+      showResult('Please enter a valid number.');
+      return;
+    }
+    // Example trick: multiply by 2, add 10, divide by 2, subtract original number = 5 always
+    let result = ((n * 2) + 10) / 2 - n;
+    showResult(`The final number is always: ${result}`);
+  });
+  final5Div.appendChild(btnFinal5);
+
+  // --- Trick 5: ATM PIN guess (simple sum) ---
+  const atmDiv = document.createElement('div');
+  atmDiv.style.marginBottom = '40px';
+  atmDiv.innerHTML = `<h3 style="color:#0a1f44;">5. ATM PIN Sum Trick</h3>`;
+  container.appendChild(atmDiv);
+
+  let { wrapper: atmInputW, input: atmInput } = createInput('Enter your 4-digit ATM PIN:', 'atm-input');
+  atmDiv.appendChild(atmInputW);
+
+  let btnAtm = document.createElement('button');
+  btnAtm.textContent = 'Calculate PIN Sum';
+  btnAtm.style.padding = '10px 20px';
+  btnAtm.style.background = '#1aa9a0';
+  btnAtm.style.border = 'none';
+  btnAtm.style.color = '#fff';
+  btnAtm.style.borderRadius = '25px';
+  btnAtm.style.fontWeight = '700';
+  btnAtm.style.cursor = 'pointer';
+  btnAtm.addEventListener('click', () => {
+    let val = atmInput.value.trim();
+    if (!/^\d{4}$/.test(val)) {
+      showResult('Please enter a 4-digit PIN.');
+      return;
+    }
+    let digits = val.split('').map(Number);
+    let sum = digits.reduce((a,b)=>a+b,0);
+    showResult(`Sum of your PIN digits is: ${sum}`);
+  });
+  atmDiv.appendChild(btnAtm);
+
+  // --- Trick 6: Phone number sum ---
+  const phoneDiv = document.createElement('div');
+  phoneDiv.style.marginBottom = '40px';
+  phoneDiv.innerHTML = `<h3 style="color:#0a1f44;">6. Phone Number Digit Sum</h3>`;
+  container.appendChild(phoneDiv);
+
+  let { wrapper: phoneInputW, input: phoneInput } = createInput('Enter your phone number (digits only):', 'phone-input');
+  phoneDiv.appendChild(phoneInputW);
+
+  let btnPhone = document.createElement('button');
+  btnPhone.textContent = 'Calculate Phone Number Sum';
+  btnPhone.style.padding = '10px 20px';
+  btnPhone.style.background = '#1aa9a0';
+  btnPhone.style.border = 'none';
+  btnPhone.style.color = '#fff';
+  btnPhone.style.borderRadius = '25px';
+  btnPhone.style.fontWeight = '700';
+  btnPhone.style.cursor = 'pointer';
+  btnPhone.addEventListener('click', () => {
+    let val = phoneInput.value.trim();
+    if (!/^\d{7,15}$/.test(val)) {
+      showResult('Please enter a valid phone number (7 to 15 digits).');
+      return;
+    }
+    let digits = val.split('').map(Number);
+    let sum = digits.reduce((a,b)=>a+b,0);
+    showResult(`Sum of your phone number digits is: ${sum}`);
+  });
+  phoneDiv.appendChild(btnPhone);
+});
